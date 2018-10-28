@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <locale.h>
 
 int getline (char *str, FILE *arq){
 	int i = 0;
@@ -31,11 +32,41 @@ void importar(FILE *arq){
 	fclose(destino);
 }
 
-int main(){
-	FILE *arq = fopen("individuos.txt", "r");
-	if(arq == NULL){
-		printf("Erro");
+void menu(){
+	int opcao = 1;
+	char nome_arq [50];
+	FILE *individuos;
+	while(opcao > 0 && opcao < 4){
+		
+		printf("Trabalho Cadastro/Busca de Cães\n");
+		printf("Opções: \n1)Importar Arquivo \n2)Buscar um cão \n3)Buscar todos os cães de uma raça \nDigite sua opção: ");
+		scanf("%d", &opcao);
+		
+		switch(opcao){
+			case 1:
+				printf("Digite o nome do arquivo para importação: ");
+				scanf("%s", nome_arq);
+				individuos = fopen(nome_arq, "r");
+				if(individuos == NULL){
+					printf("Falha na abertura do arquivo fornecido!");
+				}else{
+					importar(individuos);
+				}
+			
+			case 2:
+				// buscar cão
+				
+			case 3:
+				// buscar por raça
+			
+			default:
+				printf("Encerrando o programa!");
+		}
+		system("cls");
 	}
-	importar(arq);
-	fclose(arq);
+}
+
+int main(){
+	setlocale(LC_ALL, "Portuguese");
+	menu();
 }
