@@ -64,6 +64,7 @@ void importar(FILE *arq){
 		buffer[0] = '\0';							// limpa o buffer
 									
 	}
+	bubble_sort(indice_primario, 55);
 	fclose(destino);
 }
 
@@ -89,6 +90,7 @@ int recupera_id(int offset){
 	return atoi(aux);
 }
 
+// Constroi o Indice Secundario
 void constroi_indice_secundario(){
 	int i, j;
 	for(i = 0; i < 18; i++){
@@ -103,14 +105,24 @@ void constroi_indice_secundario(){
 	}
 }
 
+void busca_cao(int id){
+	int i;
+	for (i = 0; i < 55; i++){
+		if (id == indice_primario[i].id){
+			
+		}
+	}
+}
+
 void menu(){
 	int opcao = 1;
+	int i;
 	char nome_arq [50];
 	FILE *individuos;
-	while(opcao > 0 && opcao < 4){
+	while(opcao > 0 && opcao < 6){
 
 		printf("Trabalho Cadastro/Busca de Cães\n");
-		printf("Opções: \n1)Importar Arquivo \n2)Buscar um cão \n3)Buscar todos os cães de uma raça \nDigite sua opção: ");
+		printf("Opções: \n1)Importar Arquivo \n2)Buscar um cão \n3)Buscar todos os cães de uma raça \n4)Mostrar Indice Primário \n5)Mostrar Indice Secundário \nDigite sua opção: ");
 		scanf("%d", &opcao);
 
 		switch(opcao){
@@ -123,7 +135,9 @@ void menu(){
 				}else{
 					importar(individuos);
 					fclose(individuos);
+					constroi_indice_secundario();
 				}
+				
 				break;
 			
 			case 2:
@@ -133,7 +147,20 @@ void menu(){
 			case 3:
 				// buscar por raça
 				break;
-			
+				
+			case 4:
+				for(i = 0; i<55; i++){
+					printf("ID: %d \t Byte Offset: %d\n", indice_primario[i].id, indice_primario[i].byte_o);
+				}
+				break;
+				
+			case 5:
+				
+				for(i = 0; i < 18; i++){
+					printf("ID: %d \t Byte Offset: %d \n", indice_secundario[i].id, indice_secundario[i].byte_o);
+				}
+				break;
+				
 			default:
 				printf("Encerrando o programa!\n");
 		}
@@ -144,16 +171,4 @@ void menu(){
 int main(){
 	setlocale(LC_ALL, "Portuguese");
 	menu();
-	int i;
-	char a[20];
-	bubble_sort(indice_primario, 55);
-	
-	for(i = 0; i<55; i++){
-		printf("ID: %d \t Byte Offset: %d\n", indice_primario[i].id, indice_primario[i].byte_o);
-	}
-	printf ("\n\n\n\n\n");
-	constroi_indice_secundario();
-	for(i = 0; i < 18; i++){
-		printf("ID: %d \t Byte Offset: %d \n", indice_secundario[i].id, indice_secundario[i].byte_o);
-	}
 }
