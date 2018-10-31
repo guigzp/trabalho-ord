@@ -10,6 +10,10 @@ typedef struct{
 
 indice indice_primario[55];
 
+indice indice_secundario[18];
+
+
+// Ordenar o indice primario
 void bubble_sort (indice vetor[], int n) {
     int k, j;
     indice aux;
@@ -63,6 +67,42 @@ void importar(FILE *arq){
 	fclose(destino);
 }
 
+
+// Le um registro no offset para o buffer passado 
+void ler_registro(int offset, char* buffer){
+	int tamanho;
+	FILE* destino = fopen("destino.txt", "r");
+	fseek(destino, offset, SEEK_SET);
+	fread(&tamanho, sizeof(int), 1, destino);
+	fread(buffer, sizeof(char), tamanho, destino);
+	buffer[tamanho] = '\0';
+	fclose(destino);
+}
+
+// Devolve o id da raça de um registro
+int recupera_id(int offset){
+	char string [50];
+	char* aux;
+	ler_registro(offset, string);
+	aux = strtok(string, "|");
+	aux = strtok(NULL, "|");
+	return atoi(aux);
+}
+
+void constroi_indice_secundario(){
+	int i, j;
+	for(i = 0; i < 18; i++){
+		indice_secundario[i].id = i +1;
+		indice_secundario[i].byte_o = -1;
+		for(j = 0; j < 55; j ++){
+			if( recupera_id(indice_primario[j].byte_o) == i + 1 ){
+				indice_secundario[i].byte_o = indice_primario[j].byte_o;
+				break;			// encerra o for
+			}
+		}
+	}
+}
+
 void menu(){
 	int opcao = 1;
 	char nome_arq [50];
@@ -82,6 +122,7 @@ void menu(){
 					printf("Falha na abertura do arquivo fornecido!");
 				}else{
 					importar(individuos);
+					fclose(individuos);
 				}
 				break;
 			
@@ -92,7 +133,7 @@ void menu(){
 			case 3:
 				// buscar por raça
 				break;
-
+			
 			default:
 				printf("Encerrando o programa!\n");
 		}
@@ -104,12 +145,15 @@ int main(){
 	setlocale(LC_ALL, "Portuguese");
 	menu();
 	int i;
+	char a[20];
+	bubble_sort(indice_primario, 55);
+	
 	for(i = 0; i<55; i++){
 		printf("ID: %d \t Byte Offset: %d\n", indice_primario[i].id, indice_primario[i].byte_o);
 	}
-	bubble_sort(indice_primario, 55);
-	printf("\n\n\n\n");
-	for(i = 0; i<55; i++){
-		printf("ID: %d \t Byte Offset: %d\n", indice_primario[i].id, indice_primario[i].byte_o);
+	printf ("\n\n\n\n\n");
+	constroi_indice_secundario();
+	for(i = 0; i < 18; i++){
+		printf("ID: %d \t Byte Offset: %d \n", indice_secundario[i].id, indice_secundario[i].byte_o);
 	}
 }
