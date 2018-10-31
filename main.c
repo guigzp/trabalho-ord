@@ -10,6 +10,20 @@ typedef struct{
 
 indice indice_primario[55];
 
+void bubble_sort (indice vetor[], int n) {
+    int k, j;
+    indice aux;
+    for (k = 1; k < n; k++) {
+        for (j = 0; j < n - 1; j++) {
+            if (vetor[j].id > vetor[j + 1].id) {
+                aux          = vetor[j];
+                vetor[j]     = vetor[j + 1];
+                vetor[j + 1] = aux;
+            }
+        }
+    }
+}
+
 int getLine (char *str, FILE *arq){
 	int i = 0;
 	fgets(str, 20, arq);
@@ -29,20 +43,20 @@ void importar(FILE *arq){
 	FILE *destino = fopen("destino.txt", "w");		// arquivo onde será escrito os registros
 	while( !feof(arq) ){
 		for(i = 0; i < 4; i++){
-			getLine(string, arq);	// le uma linha do arquivo
+			getLine(string, arq);					// le uma linha do arquivo
 			
-			if(i == 0){			// pega o byte offset e os valores para o indice primario
+			if(i == 0){								// pega o byte offset e os valores para o indice primario
 				indice_primario[aux].id = atoi(string);
 				indice_primario[aux].byte_o = byte_offset;
 				aux ++;
 			}
-			strcat(buffer, string);			// concatena o lido com um buffer para armazenar o registro inteiro
+			strcat(buffer, string);					// concatena o lido com um buffer para armazenar o registro inteiro
 			
 		}
-		i = strlen(buffer);		// calcula o tamanho do registro
-		byte_offset = byte_offset + i + 4;		// calcula o byte offset do proximo registro
+		i = strlen(buffer);							// calcula o tamanho do registro
+		byte_offset = byte_offset + i + 4;			// calcula o byte offset do proximo registro
 		fwrite(&i, sizeof(int), 1, destino);		// escreve o tamanho do registro 
-		fwrite(buffer, sizeof(char), i, destino);		// escreve o registro
+		fwrite(buffer, sizeof(char), i, destino);	// escreve o registro
 		buffer[0] = '\0';							// limpa o buffer
 									
 	}
@@ -90,6 +104,11 @@ int main(){
 	setlocale(LC_ALL, "Portuguese");
 	menu();
 	int i;
+	for(i = 0; i<55; i++){
+		printf("ID: %d \t Byte Offset: %d\n", indice_primario[i].id, indice_primario[i].byte_o);
+	}
+	bubble_sort(indice_primario, 55);
+	printf("\n\n\n\n");
 	for(i = 0; i<55; i++){
 		printf("ID: %d \t Byte Offset: %d\n", indice_primario[i].id, indice_primario[i].byte_o);
 	}
