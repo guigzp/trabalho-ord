@@ -44,13 +44,13 @@ void importar(FILE *arq){
 	int i;
 	int byte_offset = 0, aux = 0;
 	char buffer[100];								// buffer para armazenar os dados do registro
-	buffer[0] = '\0';								// inicia ele vazio	
+	buffer[0] = '\0';								// inicia ele vazio
 	char string[20];								// auxiliar para ler uma linha do arquivo inicial
 	FILE *destino = fopen("destino.txt", "w");		// arquivo onde será escrito os registros
 	while( !feof(arq) ){
 		for(i = 0; i < 4; i++){
 			getLine(string, arq);					// le uma linha do arquivo
-			
+
 			if(i == 0){								// pega o byte offset e os valores para o indice primario e a a lista invertida
 				indice_primario[aux].id = atoi(string);
 				lista_invertida[aux].id = indice_primario[aux].id;
@@ -58,21 +58,21 @@ void importar(FILE *arq){
 				aux ++;
 			}
 			strcat(buffer, string);					// concatena o lido com um buffer para armazenar o registro inteiro
-			
+
 		}
 		i = strlen(buffer);							// calcula o tamanho do registro
 		byte_offset = byte_offset + i + 4;			// calcula o byte offset do proximo registro
-		fwrite(&i, sizeof(int), 1, destino);		// escreve o tamanho do registro 
+		fwrite(&i, sizeof(int), 1, destino);		// escreve o tamanho do registro
 		fwrite(buffer, sizeof(char), i, destino);	// escreve o registro
 		buffer[0] = '\0';							// limpa o buffer
-									
+
 	}
 	bubble_sort(indice_primario, 55);				// ordena o indice primario por id
 	fclose(destino);
 }
 
 
-// Le um registro no offset para o buffer passado 
+// Le um registro no offset para o buffer passado
 void ler_registro(int offset, char* buffer){
 	int tamanho;
 	FILE* destino = fopen("destino.txt", "r");
@@ -105,6 +105,19 @@ void constroi_indice_secundario(){
 				break;			// encerra o for
 			}
 		}
+	}
+}
+
+//Constroi a Lista Invertida
+void constroi_lista_invertida(){
+    int i, j;
+	for(i = 0; i < 18; i++){
+        //pegar o ID-R e procurar no arquivo retornando todos os ID-I com os seus respectivos offsets de acordo com o ID-R
+        //ordenar em ordem crescente esses offsets
+        //pegar o registro da primeir posição e inserir no campo offset o offset do segundo registro, e assim sucessivamente.
+        //O último registro será inserido o -1
+        int id_r = indice_secundario[i].id;
+
 	}
 }
 
@@ -141,21 +154,21 @@ escreve_indices(){
 	FILE* secundario = fopen("indiceSecundario.txt", "w");
 	int i;
 	char delimitador = '|';
-	
+
 	for(i = 0; i < 55; i++){
 		fwrite(&indice_primario[i].id, sizeof(int), 1, primario);
 		fwrite(&delimitador, sizeof(char), 1, primario);
 		fwrite(&indice_primario[i].byte_o, sizeof(int), 1, primario);
 		fwrite(&delimitador, sizeof(char), 1, primario);
 	}
-	
+
 	for(i = 0; i < 18; i++){
 		fwrite(&indice_secundario[i].id, sizeof(int), 1, secundario);
 		fwrite(&delimitador, sizeof(char), 1, secundario);
 		fwrite(&indice_secundario[i].byte_o, sizeof(int), 1, secundario);
 		fwrite(&delimitador, sizeof(char), 1, secundario);
 	}
-	
+
 	fclose(primario);
 	fclose(secundario);
 }
@@ -168,7 +181,7 @@ void menu(){
 	while(opcao > 0 && opcao < 6){
 
 		printf("Trabalho Cadastro/Busca de Cães\n");
-		printf("Opções: \n1)Importar Arquivo \n2)Buscar um cão \n3)Buscar todos os cães de uma raça \n4)Mostrar Indice Primário \n5)Mostrar Indice Secundário \nDigite sua opção: ");
+		printf("Opções: \n1)Importar Arquivo \n2)Buscar um cão \n3)Buscar todos os cães de uma raça \n4)Mostrar Indice Primário \n5)Mostrar Indice Secundário \n6)Mostrar lista Invertida \nDigite sua opção: ");
 		scanf("%d", &opcao);
 
 		switch(opcao){
@@ -183,32 +196,37 @@ void menu(){
 					fclose(individuos);
 					constroi_indice_secundario();
 				}
-				
+
 				break;
-			
+
 			case 2:
 				printf("Digite o ID do cão a ser buscado: ");
 				scanf("%d", &i);
 				busca_cao(i);
 				break;
-				
+
 			case 3:
 				printf("Digite o ID da raça a ser buscada: ");
 				scanf("%d", &i);
 				break;
-				
+
 			case 4:
 				for(i = 0; i<55; i++){
 					printf("ID: %d \t Byte Offset: %d\n", indice_primario[i].id, indice_primario[i].byte_o);
 				}
 				break;
-				
+
 			case 5:
 				for(i = 0; i < 18; i++){
 					printf("ID: %d \t Byte Offset: %d \n", indice_secundario[i].id, indice_secundario[i].byte_o);
 				}
 				break;
-				
+            case 6:
+				/*for(i = 0; i < 55; i++){
+					printf("ID-I: %d \t Prox-raça: %d \n", );
+				}*/
+				break;
+
 			default:
 				printf("Encerrando o programa!\n");
 		}
