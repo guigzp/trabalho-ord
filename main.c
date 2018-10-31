@@ -64,7 +64,7 @@ void importar(FILE *arq){
 		buffer[0] = '\0';							// limpa o buffer
 									
 	}
-	bubble_sort(indice_primario, 55);
+	bubble_sort(indice_primario, 55);				// ordena o indice primario por id
 	fclose(destino);
 }
 
@@ -107,10 +107,27 @@ void constroi_indice_secundario(){
 
 void busca_cao(int id){
 	int i;
+	char string [50];
+	char* aux;
+	int achou = 0;
 	for (i = 0; i < 55; i++){
 		if (id == indice_primario[i].id){
-			
+			ler_registro(indice_primario[i].byte_o, string);
+			achou = 1;
+			i = 56;
 		}
+	}
+	if(achou == 0){
+		printf("Não existe um cão com o ID informado cadastrado!\n");
+	}else{
+		aux = strtok(string, "|");
+		printf("ID: %s\n", aux);
+		aux = strtok(NULL, "|");
+		printf("ID-Raça: %s\n", aux);
+		aux = strtok(NULL, "|");
+		printf("Nome: %s\n", aux);
+		aux = strtok(NULL, "|");
+		printf("Sexo: %s\n", aux);
 	}
 }
 
@@ -141,7 +158,9 @@ void menu(){
 				break;
 			
 			case 2:
-				// buscar cão
+				printf("Digite o id do cão a ser buscado: ");
+				scanf("%d", &i);
+				busca_cao(i);
 				break;
 				
 			case 3:
@@ -155,7 +174,6 @@ void menu(){
 				break;
 				
 			case 5:
-				
 				for(i = 0; i < 18; i++){
 					printf("ID: %d \t Byte Offset: %d \n", indice_secundario[i].id, indice_secundario[i].byte_o);
 				}
