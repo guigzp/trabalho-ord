@@ -105,6 +105,8 @@ void constroi_indice_secundario(){
 	}
 }
 
+
+// Busca um cão a partir de um ID
 void busca_cao(int id){
 	int i;
 	char string [50];
@@ -114,7 +116,7 @@ void busca_cao(int id){
 		if (id == indice_primario[i].id){
 			ler_registro(indice_primario[i].byte_o, string);
 			achou = 1;
-			i = 56;
+			break;
 		}
 	}
 	if(achou == 0){
@@ -129,6 +131,30 @@ void busca_cao(int id){
 		aux = strtok(NULL, "|");
 		printf("Sexo: %s\n", aux);
 	}
+}
+
+escreve_indices(){
+	FILE* primario = fopen("indicePrimario.txt", "w");
+	FILE* secundario = fopen("indiceSecundario.txt", "w");
+	int i;
+	char delimitador = '|';
+	
+	for(i = 0; i < 55; i++){
+		fwrite(&indice_primario[i].id, sizeof(int), 1, primario);
+		fwrite(&delimitador, sizeof(char), 1, primario);
+		fwrite(&indice_primario[i].byte_o, sizeof(int), 1, primario);
+		fwrite(&delimitador, sizeof(char), 1, primario);
+	}
+	
+	for(i = 0; i < 18; i++){
+		fwrite(&indice_secundario[i].id, sizeof(int), 1, secundario);
+		fwrite(&delimitador, sizeof(char), 1, secundario);
+		fwrite(&indice_secundario[i].byte_o, sizeof(int), 1, secundario);
+		fwrite(&delimitador, sizeof(char), 1, secundario);
+	}
+	
+	fclose(primario);
+	fclose(secundario);
 }
 
 void menu(){
@@ -158,13 +184,14 @@ void menu(){
 				break;
 			
 			case 2:
-				printf("Digite o id do cão a ser buscado: ");
+				printf("Digite o ID do cão a ser buscado: ");
 				scanf("%d", &i);
 				busca_cao(i);
 				break;
 				
 			case 3:
-				// buscar por raça
+				printf("Digite o ID da raça a ser buscada: ");
+				scanf("%d", &i);
 				break;
 				
 			case 4:
@@ -189,4 +216,5 @@ void menu(){
 int main(){
 	setlocale(LC_ALL, "Portuguese");
 	menu();
+	escreve_indices();
 }
