@@ -12,6 +12,8 @@ indice indice_primario[55];
 
 indice indice_secundario[18];
 
+indice lista_invertida[55];
+
 
 // Ordenar o indice primario
 void bubble_sort (indice vetor[], int n) {
@@ -49,8 +51,9 @@ void importar(FILE *arq){
 		for(i = 0; i < 4; i++){
 			getLine(string, arq);					// le uma linha do arquivo
 			
-			if(i == 0){								// pega o byte offset e os valores para o indice primario
+			if(i == 0){								// pega o byte offset e os valores para o indice primario e a a lista invertida
 				indice_primario[aux].id = atoi(string);
+				lista_invertida[aux].id = indice_primario[aux].id;
 				indice_primario[aux].byte_o = byte_offset;
 				aux ++;
 			}
