@@ -10,7 +10,7 @@ typedef struct{
 
 indice indice_primario[55];
 
-int getline (char *str, FILE *arq){
+int getLine (char *str, FILE *arq){
 	int i = 0;
 	fgets(str, 20, arq);
 	while (str[i] != '\n' && str[i] != '\0') i++;
@@ -29,7 +29,7 @@ void importar(FILE *arq){
 	FILE *destino = fopen("destino.txt", "w");		// arquivo onde será escrito os registros
 	while( !feof(arq) ){
 		for(i = 0; i < 4; i++){
-			getline(string, arq);	// le uma linha do arquivo
+			getLine(string, arq);	// le uma linha do arquivo
 			
 			if(i == 0){			// pega o byte offset e os valores para o indice primario
 				indice_primario[aux].id = atoi(string);
@@ -37,6 +37,7 @@ void importar(FILE *arq){
 				aux ++;
 			}
 			strcat(buffer, string);			// concatena o lido com um buffer para armazenar o registro inteiro
+			
 		}
 		i = strlen(buffer);		// calcula o tamanho do registro
 		byte_offset = byte_offset + i + 4;		// calcula o byte offset do proximo registro
@@ -53,11 +54,11 @@ void menu(){
 	char nome_arq [50];
 	FILE *individuos;
 	while(opcao > 0 && opcao < 4){
-		
+
 		printf("Trabalho Cadastro/Busca de Cães\n");
 		printf("Opções: \n1)Importar Arquivo \n2)Buscar um cão \n3)Buscar todos os cães de uma raça \nDigite sua opção: ");
 		scanf("%d", &opcao);
-		
+
 		switch(opcao){
 			case 1:
 				printf("Digite o nome do arquivo para importação: ");
@@ -77,9 +78,9 @@ void menu(){
 			case 3:
 				// buscar por raça
 				break;
-			
+
 			default:
-				printf("Encerrando o programa!");
+				printf("Encerrando o programa!\n");
 		}
 		//system("cls");
 	}
