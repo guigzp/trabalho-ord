@@ -83,8 +83,21 @@ void ler_registro(int offset, char* buffer){
 	fclose(destino);
 }
 
-// Devolve o id da raça de um registro
+// Devolve o id do cão a partir de um offset
 int recupera_id(int offset){
+	int i;
+	if (offset == -1){
+		return -1;
+	}
+	for(i = 0; i < 55; i++){
+		if(indice_primario[i].byte_o == offset){
+			return indice_primario[i].id;
+		}
+	}
+}
+
+// Devolve o id da raça de um registro
+int recupera_id_raca(int offset){
 	char string [50];
 	char* aux;
 	ler_registro(offset, string);
@@ -100,7 +113,7 @@ void constroi_indice_secundario(){
 		indice_secundario[i].id = i +1;
 		indice_secundario[i].byte_o = -1;
 		for(j = 0; j < 55; j ++){
-			if( recupera_id(indice_primario[j].byte_o) == i + 1 ){
+			if( recupera_id_raca(indice_primario[j].byte_o) == i + 1 ){
 				indice_secundario[i].byte_o = indice_primario[j].byte_o;
 				break;			// encerra o for
 			}
@@ -129,7 +142,7 @@ void procura_indice_primario(int idRaca, int byte_o){
 	}
 	
 	for(i+1 ; i < 55; i++){
-		if(idRaca == recupera_id(indice_primario[i].byte_o)){
+		if(idRaca == recupera_id_raca(indice_primario[i].byte_o)){
 			escreve_lista_invertida(id_anterior, indice_primario[i].byte_o);
 			id_anterior = indice_primario[i].id;
 		}
@@ -193,6 +206,7 @@ void printa_cao(char string[]){
 	char* aux;
 	int raca;
 	aux = strtok(string, "|");
+	printf ("\n ----------------- \n");
 	printf("ID: %s\n", aux);
 	aux = strtok(NULL, "|");
 	printf("ID-Raça: %s\n", aux);
@@ -202,6 +216,7 @@ void printa_cao(char string[]){
 	printa_raca(raca);
 	aux = strtok(NULL, "|");
 	printf("Sexo: %s\n", aux);
+	printf ("\n ----------------- \n");
 }
 
 
@@ -221,6 +236,35 @@ void busca_cao(int id){
 		printf("Não existe um cão com o ID informado cadastrado!\n");
 	}else{
 		printa_cao(string);
+	}
+}
+
+// Busca todos os cães de uma raça a partir do id utilizando o indice secundario e a lista invertida
+void busca_raca(int id){
+	int i, id_anterior;
+	char string[50];
+	for(i = 0; i < 18; i++){
+		if( indice_secundario[i].id == id ){
+			break;
+		}
+	}
+	if(indice_secundario[i].byte_o != -1){
+		ler_registro(indice_secundario[i].byte_o, string);
+		printa_cao(string);
+		id_anterior = recupera_id(indice_secundario[i].byte_o);
+		while(id_anterior != -1){
+			for( i = 0; i < 55; i++){
+				if (lista_invertida[i].id == id_anterior){
+					if(lista_invertida[i].byte_o != -1){
+						ler_registro(lista_invertida[i].byte_o, string);
+						printa_cao(string);	
+					}
+					id_anterior = recupera_id(lista_invertida[i].byte_o);
+				}
+			}
+		}
+	}else{
+		printf("Não existe um cão com a raça informada cadastrado no sistema!\n");
 	}
 }
 
@@ -293,6 +337,7 @@ void menu(){
 			case 3:
 				printf("Digite o ID da raça a ser buscada: ");
 				scanf("%d", &i);
+				busca_raca(i);
 				break;
 
 			case 4:
