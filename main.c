@@ -106,6 +106,7 @@ void constroi_indice_secundario(){
 			}
 		}
 	}
+	bubble_sort(indice_secundario, 18);
 }
 
 void escreve_lista_invertida(int id, int byte_o){
@@ -141,7 +142,9 @@ void procura_indice_primario(int idRaca, int byte_o){
 void constroi_lista_invertida(){
     int i, j;
 	for(i = 0; i < 18; i++){
-       procura_indice_primario(indice_secundario[i].id, indice_secundario[i].byte_o);
+		if(indice_secundario[i].byte_o != -1){
+			procura_indice_primario(indice_secundario[i].id, indice_secundario[i].byte_o);
+		}
 	}
 }
 
