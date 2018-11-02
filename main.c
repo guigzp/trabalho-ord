@@ -148,6 +148,46 @@ void constroi_lista_invertida(){
 	}
 }
 
+void printa_raca(int idRaca){
+	if(idRaca == 1){
+		printf("Raça: BASSET HOUND\n");
+	}else if(idRaca == 2){
+		printf("Raça: BEAGLE\n");
+	}else if(idRaca == 3){
+		printf("Raça: BORDER COLLIE\n");
+	}else if(idRaca == 4){
+		printf("Raça: BOUVIER DE FLANDRES\n");
+	}else if(idRaca == 5){
+		printf("Raça: BOXER\n");
+	}else if(idRaca == 6){
+		printf("Raça: COCKER SPANIEL INGLES\n");
+	}else if(idRaca == 7){
+		printf("Raça: DALMATA\n");
+	}else if(idRaca == 8){
+		printf("Raça: DOBERMANN\n");
+	}else if(idRaca == 9){
+		printf("Raça: FOX TERRIER\n");
+	}else if(idRaca == 10){
+		printf("Raça: GOLDEN RETRIEVER\n");
+	}else if(idRaca == 11){
+		printf("Raça: LABRADOR\n");
+	}else if(idRaca == 12){
+		printf("Raça: PASTOR ALEMAO\n");
+	}else if(idRaca == 13){
+		printf("Raça: POINTER INGLES\n");
+	}else if(idRaca == 14){
+		printf("Raça: ROTTWEILER\n");
+	}else if(idRaca == 15){
+		printf("Raça: SETTER INGLES\n");
+	}else if(idRaca == 16){
+		printf("Raça: SETTER IRLANDES\n");
+	}else if(idRaca == 17){
+		printf("Raça: TERRIER BRASILEIRO\n");
+	}else if(idRaca == 18){
+		printf("Raça: YORKSHIRE TERRIER\n");
+	}
+}
+
 
 // Busca um cão a partir de um ID
 void busca_cao(int id){
@@ -155,6 +195,7 @@ void busca_cao(int id){
 	char string [50];
 	char* aux;
 	int achou = 0;
+	int raca;
 	for (i = 0; i < 55; i++){
 		if (id == indice_primario[i].id){
 			ler_registro(indice_primario[i].byte_o, string);
@@ -169,8 +210,10 @@ void busca_cao(int id){
 		printf("ID: %s\n", aux);
 		aux = strtok(NULL, "|");
 		printf("ID-Raça: %s\n", aux);
+		raca = atoi(aux);
 		aux = strtok(NULL, "|");
 		printf("Nome: %s\n", aux);
+		printa_raca(raca);
 		aux = strtok(NULL, "|");
 		printf("Sexo: %s\n", aux);
 	}
