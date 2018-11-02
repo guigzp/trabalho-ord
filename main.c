@@ -1,8 +1,19 @@
+// Trabalho 1 ORD 2018 - Profa. Valeria
+// Alunos:
+// Guilherme Zamberlam Pomini		RA: 99345
+// Alisson Lopes					RA: 99687
+// Alan Lopes						RA: 99659
+
+
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <locale.h>
 
+
+// Estrutura para abstrair o Indice Primario, Secundario e a Lista invertida
+// 4 bytes para o byte offset e 4 bytes para o id
 typedef struct{
 	int byte_o;
 	int id;
@@ -15,7 +26,7 @@ indice indice_secundario[18];
 indice lista_invertida[55];
 
 
-// Ordenar o indice primario
+// Bubble sort para ordenar o indice primario e secundário
 void bubble_sort (indice vetor[], int n) {
     int k, j;
     indice aux;
@@ -30,6 +41,7 @@ void bubble_sort (indice vetor[], int n) {
     }
 }
 
+// Le uma linha do arquivo passado e adiciona um pipe no final
 int getLine (char *str, FILE *arq){
 	int i = 0;
 	fgets(str, 20, arq);
@@ -97,6 +109,7 @@ int recupera_id(int offset){
 }
 
 // Devolve o id da raça de um registro
+// Le o registro no offset indicado e retorna somente o id-r em formato de int
 int recupera_id_raca(int offset){
 	char string [50];
 	char* aux;
@@ -111,10 +124,10 @@ void constroi_indice_secundario(){
 	int i, j;
 	for(i = 0; i < 18; i++){
 		indice_secundario[i].id = i +1;
-		indice_secundario[i].byte_o = -1;
+		indice_secundario[i].byte_o = -1;				// é iniciado com -1 caso no arquivo não tenha um cão com a raça, diferente de -1 é por ter no minimo 1
 		for(j = 0; j < 55; j ++){
-			if( recupera_id_raca(indice_primario[j].byte_o) == i + 1 ){
-				indice_secundario[i].byte_o = indice_primario[j].byte_o;
+			if( recupera_id_raca(indice_primario[j].byte_o) == i + 1 ){		// encontra a primeira ocorrencia da raça de acordo com o indice primario
+				indice_secundario[i].byte_o = indice_primario[j].byte_o;	// caso não encontre vai continuar com -1, caso encontre é colocado o byte offset 
 				break;			// encerra o for
 			}
 		}
@@ -122,6 +135,7 @@ void constroi_indice_secundario(){
 	bubble_sort(indice_secundario, 18);
 }
 
+// Recebe um id e um byte offset,  escreve o byte offset na posição que possui o id passado
 void escreve_lista_invertida(int id, int byte_o){
 	int i;
 	for(i = 0; i < 55; i++){
@@ -132,22 +146,24 @@ void escreve_lista_invertida(int id, int byte_o){
 	}
 }
 
+// Percorre o indice primario vendo as proximas raças conforme o id passado e o byte offset da primeira ocorrencia dessa raça fornecido pelo indice secundario
+// Para cada indice correspondente a raça é feita a escrita na lista invertida seguindo a ordem
 void procura_indice_primario(int idRaca, int byte_o){
 	int id_anterior, i;
-	for(i = 0; i < 55; i++){
+	for(i = 0; i < 55; i++){							// Encontra o id da primeira ocorrencia da raça de acordo com o byte offset do indice secundario
 		if( indice_primario[i].byte_o == byte_o ){
 			id_anterior = indice_primario[i].id;
 			break;
 		}
 	}
 	
-	for(i+1 ; i < 55; i++){
+	for(i+1 ; i < 55; i++){								// encontra as proximas ocorrencias da raça e vai escrevendo na lista invertida em ordem
 		if(idRaca == recupera_id_raca(indice_primario[i].byte_o)){
 			escreve_lista_invertida(id_anterior, indice_primario[i].byte_o);
 			id_anterior = indice_primario[i].id;
 		}
 	}
-	escreve_lista_invertida(id_anterior, -1);
+	escreve_lista_invertida(id_anterior, -1);			// escreve -1 para indicar que não existem mais ocorrencias dessa raça a partir desse ponto
 	
 }
 
@@ -155,12 +171,13 @@ void procura_indice_primario(int idRaca, int byte_o){
 void constroi_lista_invertida(){
     int i, j;
 	for(i = 0; i < 18; i++){
-		if(indice_secundario[i].byte_o != -1){
+		if(indice_secundario[i].byte_o != -1){				// verifica se existe pelo menos 1 ocorrencia da raça cadastrado
 			procura_indice_primario(indice_secundario[i].id, indice_secundario[i].byte_o);
 		}
 	}
 }
 
+// Printa o nome da raça de acordo com o id-r passado
 void printa_raca(int idRaca){
 	if(idRaca == 1){
 		printf("Raça: BASSET HOUND\n");
@@ -206,7 +223,7 @@ void printa_cao(char string[]){
 	char* aux;
 	int raca;
 	aux = strtok(string, "|");
-	printf ("\n ----------------- \n");
+	printf ("\n ------------------- \n");
 	printf("ID: %s\n", aux);
 	aux = strtok(NULL, "|");
 	printf("ID-Raça: %s\n", aux);
@@ -216,7 +233,7 @@ void printa_cao(char string[]){
 	printa_raca(raca);
 	aux = strtok(NULL, "|");
 	printf("Sexo: %s\n", aux);
-	printf ("\n ----------------- \n");
+	printf (" ------------------- \n");
 }
 
 
@@ -239,7 +256,7 @@ void busca_cao(int id){
 	}
 }
 
-// Busca todos os cães de uma raça a partir do id utilizando o indice secundario e a lista invertida
+// Busca todos os cães de uma raça a partir do id utilizando o indice primario, secundario e a lista invertida
 void busca_raca(int id){
 	int i, id_anterior;
 	char string[50];
@@ -248,11 +265,11 @@ void busca_raca(int id){
 			break;
 		}
 	}
-	if(indice_secundario[i].byte_o != -1){
+	if(indice_secundario[i].byte_o != -1){					// verifica se o id-r fornecido está cadastrado
 		ler_registro(indice_secundario[i].byte_o, string);
-		printa_cao(string);
+		printa_cao(string);											// printa o primeiro de acordo com o indice secundario
 		id_anterior = recupera_id(indice_secundario[i].byte_o);
-		while(id_anterior != -1){
+		while(id_anterior != -1){								// printa os cães na ordem da lista invertida
 			for( i = 0; i < 55; i++){
 				if (lista_invertida[i].id == id_anterior){
 					if(lista_invertida[i].byte_o != -1){
@@ -268,6 +285,7 @@ void busca_raca(int id){
 	}
 }
 
+// Escreve em arquivos o Indice Primario, Secundario e a Lista Invertida
 void escreve_indices(){
 	FILE* primario = fopen("indicePrimario.txt", "w");
 	FILE* secundario = fopen("indiceSecundario.txt", "w");
@@ -275,6 +293,7 @@ void escreve_indices(){
 	int i;
 	char delimitador = '|';
 
+	// Escrita do indice primario
 	for(i = 0; i < 55; i++){
 		fwrite(&indice_primario[i].id, sizeof(int), 1, primario);
 		fwrite(&delimitador, sizeof(char), 1, primario);
@@ -282,6 +301,7 @@ void escreve_indices(){
 		fwrite(&delimitador, sizeof(char), 1, primario);
 	}
 
+	// Escrita do Indice Secundario
 	for(i = 0; i < 18; i++){
 		fwrite(&indice_secundario[i].id, sizeof(int), 1, secundario);
 		fwrite(&delimitador, sizeof(char), 1, secundario);
@@ -289,6 +309,8 @@ void escreve_indices(){
 		fwrite(&delimitador, sizeof(char), 1, secundario);
 	}
 	
+	
+	// Escrita da Lista Invertida (poderia ser junto do indice primario mas está separado para melhor visualização)
 	for(i = 0; i < 55; i++){
 		fwrite(&lista_invertida[i].id, sizeof(int), 1, invertida);
 		fwrite(&delimitador, sizeof(char), 1, invertida);
@@ -301,19 +323,37 @@ void escreve_indices(){
 	fclose(invertida);
 }
 
+void printa_menu(){
+	system("cls");
+	printf("\t Trabalho Cadastro/Busca de Cães\n");
+	printf("-------------------------------------------------\n");
+	printf("|\t Opções:                                |\n");
+	printf("|                                               |");
+	printf("\n|\t 1) Importar Arquivo                    |");
+	printf("\n|\t 2) Buscar um cão                       |");
+	printf("\n|\t 3) Buscar todos os cães de uma raça    |");
+	printf("\n|\t 4) Mostrar Indice Primário             |");
+	printf("\n|\t 5) Mostrar Indice Secundário           |");
+	printf("\n|\t 6) Mostrar lista Invertida             |");
+	printf("\n|\t 0) Encerrar                            |");
+	printf("\n-------------------------------------------------");
+	printf("\nDigite sua opção: ");
+}
+
+// Menu para as opções
 void menu(){
 	int opcao = 1;
 	int i;
 	char nome_arq [50];
 	FILE *individuos;
 	while(opcao > 0 && opcao < 7){
-
-		printf("Trabalho Cadastro/Busca de Cães\n");
-		printf("Opções: \n1)Importar Arquivo \n2)Buscar um cão \n3)Buscar todos os cães de uma raça \n4)Mostrar Indice Primário \n5)Mostrar Indice Secundário \n6)Mostrar lista Invertida \nDigite sua opção: ");
+		
+		printa_menu();
 		scanf("%d", &opcao);
-
+		
 		switch(opcao){
 			case 1:
+				system("cls");
 				printf("Digite o nome do arquivo para importação: ");
 				scanf("%s", nome_arq);
 				individuos = fopen(nome_arq, "r");
@@ -324,43 +364,57 @@ void menu(){
 					fclose(individuos);
 					constroi_indice_secundario();
 					constroi_lista_invertida();
+					printf("Arquivo Importado com sucesso!\n");
+					system("PAUSE");
 				}
 
 				break;
 
 			case 2:
+				system("cls");
 				printf("Digite o ID do cão a ser buscado: ");
 				scanf("%d", &i);
 				busca_cao(i);
+				system("PAUSE");
 				break;
 
 			case 3:
+				system("cls");
 				printf("Digite o ID da raça a ser buscada: ");
 				scanf("%d", &i);
 				busca_raca(i);
+				system("PAUSE");
 				break;
 
 			case 4:
+				system("cls");
+				printf("Indice Primario: \n");
 				for(i = 0; i<55; i++){
 					printf("ID: %d \t Byte Offset: %d\n", indice_primario[i].id, indice_primario[i].byte_o);
 				}
+				system("PAUSE");
 				break;
 
 			case 5:
+				system("cls");
+				printf("Indice Secundario: \n");
 				for(i = 0; i < 18; i++){
 					printf("ID: %d \t Byte Offset: %d \n", indice_secundario[i].id, indice_secundario[i].byte_o);
 				}
+				system("PAUSE");
 				break;
             case 6:
+            	system("cls");
+            	printf("Lista Invertida: \n");
 				for(i = 0; i < 55; i++){
 					printf("ID-I: %d \t Prox-raça: %d \n", lista_invertida[i].id, lista_invertida[i].byte_o);
 				}
+				system("PAUSE");
 				break;
 
 			default:
 				printf("Encerrando o programa!\n");
 		}
-		//system("cls");
 	}
 }
 
