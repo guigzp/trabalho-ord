@@ -188,14 +188,28 @@ void printa_raca(int idRaca){
 	}
 }
 
+// Função para printar os dados de um cão
+void printa_cao(char string[]){
+	char* aux;
+	int raca;
+	aux = strtok(string, "|");
+	printf("ID: %s\n", aux);
+	aux = strtok(NULL, "|");
+	printf("ID-Raça: %s\n", aux);
+	raca = atoi(aux);
+	aux = strtok(NULL, "|");
+	printf("Nome: %s\n", aux);
+	printa_raca(raca);
+	aux = strtok(NULL, "|");
+	printf("Sexo: %s\n", aux);
+}
+
 
 // Busca um cão a partir de um ID
 void busca_cao(int id){
 	int i;
 	char string [50];
-	char* aux;
 	int achou = 0;
-	int raca;
 	for (i = 0; i < 55; i++){
 		if (id == indice_primario[i].id){
 			ler_registro(indice_primario[i].byte_o, string);
@@ -206,16 +220,7 @@ void busca_cao(int id){
 	if(achou == 0){
 		printf("Não existe um cão com o ID informado cadastrado!\n");
 	}else{
-		aux = strtok(string, "|");
-		printf("ID: %s\n", aux);
-		aux = strtok(NULL, "|");
-		printf("ID-Raça: %s\n", aux);
-		raca = atoi(aux);
-		aux = strtok(NULL, "|");
-		printf("Nome: %s\n", aux);
-		printa_raca(raca);
-		aux = strtok(NULL, "|");
-		printf("Sexo: %s\n", aux);
+		printa_cao(string);
 	}
 }
 
