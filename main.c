@@ -108,16 +108,40 @@ void constroi_indice_secundario(){
 	}
 }
 
+void escreve_lista_invertida(int id, int byte_o){
+	int i;
+	for(i = 0; i < 55; i++){
+		if( lista_invertida[i].id == id ){
+			lista_invertida[i].byte_o = byte_o;
+			break;
+		}
+	}
+}
+
+void procura_indice_primario(int idRaca, int byte_o){
+	int id_anterior, i,j;
+	for(i = 0; i < 55; i++){
+		if( indice_primario[i].byte_o == byte_o ){
+			id_anterior = indice_primario[i].id;
+			break;
+		}
+	}
+	
+	for(i+1 ; i < 55; i++){
+		if(idRaca == recupera_id(indice_primario[i].byte_o)){
+			escreve_lista_invertida(id_anterior, indice_primario[i].byte_o);
+			id_anterior = indice_primario[i].id;
+		}
+	}
+	escreve_lista_invertida(id_anterior, -1);
+	
+}
+
 //Constroi a Lista Invertida
 void constroi_lista_invertida(){
     int i, j;
 	for(i = 0; i < 18; i++){
-        //pegar o ID-R e procurar no arquivo retornando todos os ID-I com os seus respectivos offsets de acordo com o ID-R
-        //ordenar em ordem crescente esses offsets
-        //pegar o registro da primeir posição e inserir no campo offset o offset do segundo registro, e assim sucessivamente.
-        //O último registro será inserido o -1
-        int id_r = indice_secundario[i].id;
-
+       procura_indice_primario(indice_secundario[i].id, indice_secundario[i].byte_o);
 	}
 }
 
@@ -149,7 +173,7 @@ void busca_cao(int id){
 	}
 }
 
-escreve_indices(){
+void escreve_indices(){
 	FILE* primario = fopen("indicePrimario.txt", "w");
 	FILE* secundario = fopen("indiceSecundario.txt", "w");
 	int i;
@@ -178,7 +202,7 @@ void menu(){
 	int i;
 	char nome_arq [50];
 	FILE *individuos;
-	while(opcao > 0 && opcao < 6){
+	while(opcao > 0 && opcao < 7){
 
 		printf("Trabalho Cadastro/Busca de Cães\n");
 		printf("Opções: \n1)Importar Arquivo \n2)Buscar um cão \n3)Buscar todos os cães de uma raça \n4)Mostrar Indice Primário \n5)Mostrar Indice Secundário \n6)Mostrar lista Invertida \nDigite sua opção: ");
@@ -195,6 +219,7 @@ void menu(){
 					importar(individuos);
 					fclose(individuos);
 					constroi_indice_secundario();
+					constroi_lista_invertida();
 				}
 
 				break;
@@ -222,9 +247,9 @@ void menu(){
 				}
 				break;
             case 6:
-				/*for(i = 0; i < 55; i++){
-					printf("ID-I: %d \t Prox-raça: %d \n", );
-				}*/
+				for(i = 0; i < 55; i++){
+					printf("ID-I: %d \t Prox-raça: %d \n", lista_invertida[i].id, lista_invertida[i].byte_o);
+				}
 				break;
 
 			default:
