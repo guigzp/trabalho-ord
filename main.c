@@ -119,7 +119,7 @@ void escreve_lista_invertida(int id, int byte_o){
 }
 
 void procura_indice_primario(int idRaca, int byte_o){
-	int id_anterior, i,j;
+	int id_anterior, i;
 	for(i = 0; i < 55; i++){
 		if( indice_primario[i].byte_o == byte_o ){
 			id_anterior = indice_primario[i].id;
@@ -176,6 +176,7 @@ void busca_cao(int id){
 void escreve_indices(){
 	FILE* primario = fopen("indicePrimario.txt", "w");
 	FILE* secundario = fopen("indiceSecundario.txt", "w");
+	FILE* invertida = fopen("listaInvertida.txt", "w");
 	int i;
 	char delimitador = '|';
 
@@ -192,9 +193,17 @@ void escreve_indices(){
 		fwrite(&indice_secundario[i].byte_o, sizeof(int), 1, secundario);
 		fwrite(&delimitador, sizeof(char), 1, secundario);
 	}
+	
+	for(i = 0; i < 55; i++){
+		fwrite(&lista_invertida[i].id, sizeof(int), 1, invertida);
+		fwrite(&delimitador, sizeof(char), 1, invertida);
+		fwrite(&lista_invertida[i].byte_o, sizeof(int), 1, invertida);
+		fwrite(&delimitador, sizeof(char), 1, invertida);
+	}
 
 	fclose(primario);
 	fclose(secundario);
+	fclose(invertida);
 }
 
 void menu(){
