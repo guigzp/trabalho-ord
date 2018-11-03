@@ -19,11 +19,15 @@ typedef struct{
 	int id;
 }indice;
 
-indice indice_primario[55];
+// Trabalho comporta até 250 registros
+
+indice indice_primario[250];
 
 indice indice_secundario[18];
 
-indice lista_invertida[55];
+indice lista_invertida[250];
+
+int tamanho = -1;
 
 
 // Bubble sort para ordenar o indice primario e secundário
@@ -52,13 +56,12 @@ int getLine (char *str, FILE *arq){
 }
 
 // Função para ler um arquivo e o formatar para um arquivo com o tamanho antes de cada registro com os campos separados por pipes
-void importar(FILE *arq){
-	int i;
-	int byte_offset = 0, aux = 0;
+int importar(FILE *arq){
+	int i, count = 0, byte_offset = 0, aux = 0;
 	char buffer[100];								// buffer para armazenar os dados do registro
 	buffer[0] = '\0';								// inicia ele vazio
 	char string[20];								// auxiliar para ler uma linha do arquivo inicial
-	FILE *destino = fopen("destino.txt", "w");		// arquivo onde será escrito os registros
+	FILE *destino = fopen("individuos.txt", "w");		// arquivo onde será escrito os registros
 	while( !feof(arq) ){
 		for(i = 0; i < 4; i++){
 			getLine(string, arq);					// le uma linha do arquivo
@@ -77,17 +80,19 @@ void importar(FILE *arq){
 		fwrite(&i, sizeof(int), 1, destino);		// escreve o tamanho do registro
 		fwrite(buffer, sizeof(char), i, destino);	// escreve o registro
 		buffer[0] = '\0';							// limpa o buffer
+		count ++;
 
 	}
-	bubble_sort(indice_primario, 55);				// ordena o indice primario por id
+	bubble_sort(indice_primario, count);				// ordena o indice primario por id
 	fclose(destino);
+	return count;
 }
 
 
 // Le um registro no offset para o buffer passado
 void ler_registro(int offset, char* buffer){
 	int tamanho;
-	FILE* destino = fopen("destino.txt", "r");
+	FILE* destino = fopen("individuos.txt", "r");
 	fseek(destino, offset, SEEK_SET);
 	fread(&tamanho, sizeof(int), 1, destino);
 	fread(buffer, sizeof(char), tamanho, destino);
@@ -101,7 +106,7 @@ int recupera_id(int offset){
 	if (offset == -1){
 		return -1;
 	}
-	for(i = 0; i < 55; i++){
+	for(i = 0; i < tamanho; i++){
 		if(indice_primario[i].byte_o == offset){
 			return indice_primario[i].id;
 		}
@@ -125,7 +130,7 @@ void constroi_indice_secundario(){
 	for(i = 0; i < 18; i++){
 		indice_secundario[i].id = i +1;
 		indice_secundario[i].byte_o = -1;				// é iniciado com -1 caso no arquivo não tenha um cão com a raça, diferente de -1 é por ter no minimo 1
-		for(j = 0; j < 55; j ++){
+		for(j = 0; j < tamanho; j ++){
 			if( recupera_id_raca(indice_primario[j].byte_o) == i + 1 ){		// encontra a primeira ocorrencia da raça de acordo com o indice primario
 				indice_secundario[i].byte_o = indice_primario[j].byte_o;	// caso não encontre vai continuar com -1, caso encontre é colocado o byte offset 
 				break;			// encerra o for
@@ -138,7 +143,7 @@ void constroi_indice_secundario(){
 // Recebe um id e um byte offset,  escreve o byte offset na posição que possui o id passado
 void escreve_lista_invertida(int id, int byte_o){
 	int i;
-	for(i = 0; i < 55; i++){
+	for(i = 0; i < tamanho; i++){
 		if( lista_invertida[i].id == id ){
 			lista_invertida[i].byte_o = byte_o;
 			break;
@@ -150,14 +155,14 @@ void escreve_lista_invertida(int id, int byte_o){
 // Para cada indice correspondente a raça é feita a escrita na lista invertida seguindo a ordem
 void procura_indice_primario(int idRaca, int byte_o){
 	int id_anterior, i;
-	for(i = 0; i < 55; i++){							// Encontra o id da primeira ocorrencia da raça de acordo com o byte offset do indice secundario
+	for(i = 0; i < tamanho; i++){							// Encontra o id da primeira ocorrencia da raça de acordo com o byte offset do indice secundario
 		if( indice_primario[i].byte_o == byte_o ){
 			id_anterior = indice_primario[i].id;
 			break;
 		}
 	}
 	
-	for(i+1 ; i < 55; i++){								// encontra as proximas ocorrencias da raça e vai escrevendo na lista invertida em ordem
+	for(i+1 ; i < tamanho; i++){								// encontra as proximas ocorrencias da raça e vai escrevendo na lista invertida em ordem
 		if(idRaca == recupera_id_raca(indice_primario[i].byte_o)){
 			escreve_lista_invertida(id_anterior, indice_primario[i].byte_o);
 			id_anterior = indice_primario[i].id;
@@ -242,7 +247,7 @@ void busca_cao(int id){
 	int i;
 	char string [50];
 	int achou = 0;
-	for (i = 0; i < 55; i++){
+	for (i = 0; i < tamanho; i++){
 		if (id == indice_primario[i].id){
 			ler_registro(indice_primario[i].byte_o, string);
 			achou = 1;
@@ -270,7 +275,7 @@ void busca_raca(int id){
 		printa_cao(string);											// printa o primeiro de acordo com o indice secundario
 		id_anterior = recupera_id(indice_secundario[i].byte_o);
 		while(id_anterior != -1){								// printa os cães na ordem da lista invertida
-			for( i = 0; i < 55; i++){
+			for( i = 0; i < tamanho; i++){
 				if (lista_invertida[i].id == id_anterior){
 					if(lista_invertida[i].byte_o != -1){
 						ler_registro(lista_invertida[i].byte_o, string);
@@ -294,7 +299,7 @@ void escreve_indices(){
 	char delimitador = '|';
 
 	// Escrita do indice primario
-	for(i = 0; i < 55; i++){
+	for(i = 0; i < tamanho; i++){
 		fwrite(&indice_primario[i].id, sizeof(int), 1, primario);
 		fwrite(&delimitador, sizeof(char), 1, primario);
 		fwrite(&indice_primario[i].byte_o, sizeof(int), 1, primario);
@@ -303,15 +308,17 @@ void escreve_indices(){
 
 	// Escrita do Indice Secundario
 	for(i = 0; i < 18; i++){
-		fwrite(&indice_secundario[i].id, sizeof(int), 1, secundario);
-		fwrite(&delimitador, sizeof(char), 1, secundario);
-		fwrite(&indice_secundario[i].byte_o, sizeof(int), 1, secundario);
-		fwrite(&delimitador, sizeof(char), 1, secundario);
+		if(indice_secundario[i].byte_o != -1){
+			fwrite(&indice_secundario[i].id, sizeof(int), 1, secundario);
+			fwrite(&delimitador, sizeof(char), 1, secundario);
+			fwrite(&indice_secundario[i].byte_o, sizeof(int), 1, secundario);
+			fwrite(&delimitador, sizeof(char), 1, secundario);
+		}
 	}
 	
 	
 	// Escrita da Lista Invertida (poderia ser junto do indice primario mas está separado para melhor visualização)
-	for(i = 0; i < 55; i++){
+	for(i = 0; i < tamanho; i++){
 		fwrite(&lista_invertida[i].id, sizeof(int), 1, invertida);
 		fwrite(&delimitador, sizeof(char), 1, invertida);
 		fwrite(&lista_invertida[i].byte_o, sizeof(int), 1, invertida);
@@ -342,8 +349,7 @@ void printa_menu(){
 
 // Menu para as opções
 void menu(){
-	int opcao = 1;
-	int i;
+	int opcao = 1, i;
 	char nome_arq [50];
 	FILE *individuos;
 	while(opcao > 0 && opcao < 7){
@@ -360,7 +366,7 @@ void menu(){
 				if(individuos == NULL){
 					printf("Falha na abertura do arquivo fornecido!");
 				}else{
-					importar(individuos);
+					tamanho = importar(individuos);		// tamanho recebe a quantidade de registros
 					fclose(individuos);
 					constroi_indice_secundario();
 					constroi_lista_invertida();
@@ -389,7 +395,7 @@ void menu(){
 			case 4:
 				system("cls");
 				printf("Indice Primario: \n");
-				for(i = 0; i<55; i++){
+				for(i = 0; i < tamanho; i++){
 					printf("ID: %d \t Byte Offset: %d\n", indice_primario[i].id, indice_primario[i].byte_o);
 				}
 				system("PAUSE");
@@ -399,6 +405,7 @@ void menu(){
 				system("cls");
 				printf("Indice Secundario: \n");
 				for(i = 0; i < 18; i++){
+					if(indice_secundario[i].byte_o != -1)
 					printf("ID: %d \t Byte Offset: %d \n", indice_secundario[i].id, indice_secundario[i].byte_o);
 				}
 				system("PAUSE");
@@ -406,7 +413,7 @@ void menu(){
             case 6:
             	system("cls");
             	printf("Lista Invertida: \n");
-				for(i = 0; i < 55; i++){
+				for(i = 0; i < tamanho; i++){
 					printf("ID-I: %d \t Prox-raça: %d \n", lista_invertida[i].id, lista_invertida[i].byte_o);
 				}
 				system("PAUSE");

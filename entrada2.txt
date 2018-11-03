@@ -1,0 +1,12 @@
+23
+6
+LADY
+F
+19
+13
+PIPOCA
+F
+25
+1
+THOR
+M
