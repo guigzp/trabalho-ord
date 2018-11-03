@@ -378,43 +378,64 @@ void menu(){
 
 			case 2:
 				system("cls");
-				printf("Digite o ID do cão a ser buscado: ");
-				scanf("%d", &i);
-				busca_cao(i);
+				if(tamanho == -1){
+					printf("Necessário importar um arquivo primeiro!\n");
+				}else{
+					printf("Digite o ID do cão a ser buscado: ");
+					scanf("%d", &i);
+					busca_cao(i);
+				}
 				system("PAUSE");
 				break;
 
 			case 3:
 				system("cls");
-				printf("Digite o ID da raça a ser buscada: ");
-				scanf("%d", &i);
-				busca_raca(i);
+				if(tamanho == -1){
+					printf("Necessário importar um arquivo primeiro!\n");
+				}else{
+					printf("Digite o ID da raça a ser buscada: ");
+					scanf("%d", &i);
+					busca_raca(i);
+				}
 				system("PAUSE");
 				break;
 
 			case 4:
 				system("cls");
-				printf("Indice Primario: \n");
-				for(i = 0; i < tamanho; i++){
-					printf("ID: %d \t Byte Offset: %d\n", indice_primario[i].id, indice_primario[i].byte_o);
+				if(tamanho == -1){
+					printf("Necessário importar um arquivo primeiro!\n");
+				}else{
+					printf("Indice Primario: \n");
+					for(i = 0; i < tamanho; i++){
+						printf("ID: %d \t Byte Offset: %d\n", indice_primario[i].id, indice_primario[i].byte_o);
+					}
 				}
 				system("PAUSE");
 				break;
 
 			case 5:
 				system("cls");
-				printf("Indice Secundario: \n");
-				for(i = 0; i < 18; i++){
-					if(indice_secundario[i].byte_o != -1)
-					printf("ID: %d \t Byte Offset: %d \n", indice_secundario[i].id, indice_secundario[i].byte_o);
+				if(tamanho == -1){
+					printf("Necessário importar um arquivo primeiro!\n");
+				}else{
+					printf("Indice Secundario: \n");
+					for(i = 0; i < 18; i++){
+						if(indice_secundario[i].byte_o != -1)
+						printf("ID: %d \t Byte Offset: %d \n", indice_secundario[i].id, indice_secundario[i].byte_o);
+					}
 				}
 				system("PAUSE");
 				break;
+				
             case 6:
             	system("cls");
-            	printf("Lista Invertida: \n");
-				for(i = 0; i < tamanho; i++){
-					printf("ID-I: %d \t Prox-raça: %d \n", lista_invertida[i].id, lista_invertida[i].byte_o);
+            	if(tamanho == -1){
+            		printf("Necessário importar um arquivo primeiro!\n");
+				}else{
+					printf("Lista Invertida: \n");
+					for(i = 0; i < tamanho; i++){
+						printf("ID-I: %d \t Prox-raça: %d \n", lista_invertida[i].id, lista_invertida[i].byte_o);
+					}
 				}
 				system("PAUSE");
 				break;
