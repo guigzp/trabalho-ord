@@ -146,35 +146,33 @@ void constroi_indice_secundario(){
 	bubble_sort(indice_secundario, 18);
 }
 
-// Recebe um id e um byte offset,  escreve o byte offset na posição que possui o id passado
-void escreve_lista_invertida(int id, int byte_o){
+// retorna o rrn da lista invertida que o id indicado está
+int procura_rrn(int id){
 	int i;
 	for(i = 0; i < tamanho; i++){
-		if( lista_invertida[i].id == id ){
-			lista_invertida[i].byte_o = byte_o;
-			break;
+		if(lista_invertida[i].id == id){
+			return i;
 		}
 	}
 }
 
-// Percorre o indice primario vendo as proximas raças conforme o id passado e o byte offset da primeira ocorrencia dessa raça fornecido pelo indice secundario
+// Percorre o indice primario vendo as proximas raças conforme o id passado e o rrn da primeira ocorrencia dessa raça fornecido pelo indice secundario
 // Para cada indice correspondente a raça é feita a escrita na lista invertida seguindo a ordem
-void procura_indice_primario(int idRaca, int byte_o){
-	int id_anterior, i;
+void procura_indice_primario(int idRaca, int rrn){
+	int i;
 	for(i = 0; i < tamanho; i++){							// Encontra o id da primeira ocorrencia da raça de acordo com o byte offset do indice secundario
-		if( indice_primario[i].byte_o == byte_o ){
-			id_anterior = indice_primario[i].id;
+		if( indice_primario[i].id == lista_invertida[rrn].id ){
 			break;
 		}
 	}
 	
 	for(i+1 ; i < tamanho; i++){								// encontra as proximas ocorrencias da raça e vai escrevendo na lista invertida em ordem
 		if(idRaca == recupera_id_raca(indice_primario[i].byte_o)){
-			escreve_lista_invertida(id_anterior, indice_primario[i].byte_o);
-			id_anterior = indice_primario[i].id;
+			lista_invertida[rrn].byte_o = procura_rrn(indice_primario[i].id);
+			rrn = procura_rrn(indice_primario[i].id);
 		}
 	}
-	escreve_lista_invertida(id_anterior, -1);			// escreve -1 para indicar que não existem mais ocorrencias dessa raça a partir desse ponto
+	lista_invertida[rrn].byte_o = -1;	 // escreve -1 para indicar que não existem mais ocorrencias dessa raça a partir desse ponto
 	
 }
 
@@ -427,7 +425,7 @@ void menu(){
 					printf("Indice Secundario: \n");
 					for(i = 0; i < 18; i++){
 						if(indice_secundario[i].byte_o != -1)
-						printf("ID-R: %d \t Byte Offset: %d \n", indice_secundario[i].id, indice_secundario[i].byte_o);
+						printf("ID-R: %d \t RRN: %d \n", indice_secundario[i].id, indice_secundario[i].byte_o);
 					}
 				}
 				system("PAUSE");
@@ -440,7 +438,7 @@ void menu(){
 				}else{
 					printf("Lista Invertida: \n");
 					for(i = 0; i < tamanho; i++){
-						printf("ID-I: %d \t Prox-raça: %d \n", lista_invertida[i].id, lista_invertida[i].byte_o);
+						printf("RRN: %d \t ID-I: %d \t RRN Prox-raça: %d \n", i, lista_invertida[i].id, lista_invertida[i].byte_o);
 					}
 				}
 				system("PAUSE");
