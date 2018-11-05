@@ -126,13 +126,19 @@ int recupera_id_raca(int offset){
 
 // Constroi o Indice Secundario
 void constroi_indice_secundario(){
-	int i, j;
+	int i, j, k;
 	for(i = 0; i < 18; i++){
 		indice_secundario[i].id = i +1;
 		indice_secundario[i].byte_o = -1;				// é iniciado com -1 caso no arquivo não tenha um cão com a raça, diferente de -1 é por ter no minimo 1
 		for(j = 0; j < tamanho; j ++){
 			if( recupera_id_raca(indice_primario[j].byte_o) == i + 1 ){		// encontra a primeira ocorrencia da raça de acordo com o indice primario
-				indice_secundario[i].byte_o = indice_primario[j].byte_o;	// caso não encontre vai continuar com -1, caso encontre é colocado o byte offset 
+				// procura o RRN da lista invertida que possui o id da primeira ocorrencia da raça
+				for(k = 0; k < tamanho; k++){
+					if(lista_invertida[k].id == indice_primario[j].id){
+						indice_secundario[i].byte_o = k;
+						break;
+					}
+				}
 				break;			// encerra o for
 			}
 		}
@@ -407,7 +413,7 @@ void menu(){
 				}else{
 					printf("Indice Primario: \n");
 					for(i = 0; i < tamanho; i++){
-						printf("ID: %d \t Byte Offset: %d\n", indice_primario[i].id, indice_primario[i].byte_o);
+						printf("ID-I: %d \t Byte Offset: %d\n", indice_primario[i].id, indice_primario[i].byte_o);
 					}
 				}
 				system("PAUSE");
@@ -421,7 +427,7 @@ void menu(){
 					printf("Indice Secundario: \n");
 					for(i = 0; i < 18; i++){
 						if(indice_secundario[i].byte_o != -1)
-						printf("ID: %d \t Byte Offset: %d \n", indice_secundario[i].id, indice_secundario[i].byte_o);
+						printf("ID-R: %d \t Byte Offset: %d \n", indice_secundario[i].id, indice_secundario[i].byte_o);
 					}
 				}
 				system("PAUSE");
