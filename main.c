@@ -14,6 +14,10 @@
 
 // Estrutura para abstrair o Indice Primario, Secundario e a Lista invertida
 // 4 bytes para o byte offset e 4 bytes para o id
+
+// A mesma estrutura vai ser utilizada para Indice Primario, Secundario e a Lista invertida
+// no caso do Indice Secundario e da Lista invertida, o campo byte_of simboliza o rrn
+
 typedef struct{
 	int byte_o;
 	int id;
@@ -265,29 +269,34 @@ void busca_cao(int id){
 	}
 }
 
+// Recupera o offset de um ID-I
+int recupera_offset(int id){
+	int i;
+	for(i = 0; i < tamanho; i++){
+		if(indice_primario[i].id == id){
+			return indice_primario[i].byte_o;
+		}
+	}
+}
+
 // Busca todos os cães de uma raça a partir do id utilizando o indice primario, secundario e a lista invertida
 void busca_raca(int id){
-	int i, id_anterior;
+	int i, proximo;
 	char string[50];
-	for(i = 0; i < 18; i++){
+	for(i = 0; i < 18; i++){					// encontra a primeira ocorrencia da raça fornecida pelo indice secundario
 		if( indice_secundario[i].id == id ){
+			proximo = indice_secundario[i].byte_o;
 			break;
 		}
 	}
 	if(indice_secundario[i].byte_o != -1){					// verifica se o id-r fornecido está cadastrado
-		ler_registro(indice_secundario[i].byte_o, string);
+		ler_registro(recupera_offset(lista_invertida[proximo].id), string);
 		printa_cao(string);											// printa o primeiro de acordo com o indice secundario
-		id_anterior = recupera_id(indice_secundario[i].byte_o);
-		while(id_anterior != -1){								// printa os cães na ordem da lista invertida
-			for( i = 0; i < tamanho; i++){
-				if (lista_invertida[i].id == id_anterior){
-					if(lista_invertida[i].byte_o != -1){
-						ler_registro(lista_invertida[i].byte_o, string);
-						printa_cao(string);	
-					}
-					id_anterior = recupera_id(lista_invertida[i].byte_o);
-				}
-			}
+		proximo = lista_invertida[proximo].byte_o;
+		while(proximo != -1){								// printa os cães na ordem da lista invertida
+			ler_registro(recupera_offset(lista_invertida[proximo].id), string);
+			printa_cao(string);
+			proximo = lista_invertida[proximo].byte_o;
 		}
 	}else{
 		printf("Não existe um cão com a raça informada cadastrado no sistema!\n");
