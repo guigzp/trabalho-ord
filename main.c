@@ -65,7 +65,7 @@ int importar(FILE *arq){
 	char buffer[100];								// buffer para armazenar os dados do registro
 	buffer[0] = '\0';								// inicia ele vazio
 	char string[20];								// auxiliar para ler uma linha do arquivo inicial
-	FILE *destino = fopen("individuos.txt", "w");		// arquivo onde será escrito os registros
+	FILE *individuos = fopen("individuos.txt", "w");		// arquivo onde será escrito os registros
 	while( !feof(arq) ){
 		for(i = 0; i < 4; i++){
 			getLine(string, arq);					// le uma linha do arquivo
@@ -81,14 +81,14 @@ int importar(FILE *arq){
 		}
 		i = strlen(buffer);							// calcula o tamanho do registro
 		byte_offset = byte_offset + i + 4;			// calcula o byte offset do proximo registro
-		fwrite(&i, sizeof(int), 1, destino);		// escreve o tamanho do registro
-		fwrite(buffer, sizeof(char), i, destino);	// escreve o registro
+		fwrite(&i, sizeof(int), 1, individuos);		// escreve o tamanho do registro
+		fwrite(buffer, sizeof(char), i, individuos);	// escreve o registro
 		buffer[0] = '\0';							// limpa o buffer
 		count ++;
 
 	}
 	bubble_sort(indice_primario, count);				// ordena o indice primario por id
-	fclose(destino);
+	fclose(individuos);
 	return count;
 }
 
@@ -96,12 +96,12 @@ int importar(FILE *arq){
 // Le um registro no offset para o buffer passado
 void ler_registro(int offset, char* buffer){
 	int tamanho;
-	FILE* destino = fopen("individuos.txt", "r");
-	fseek(destino, offset, SEEK_SET);
-	fread(&tamanho, sizeof(int), 1, destino);
-	fread(buffer, sizeof(char), tamanho, destino);
+	FILE* individuos = fopen("individuos.txt", "r");
+	fseek(individuos, offset, SEEK_SET);
+	fread(&tamanho, sizeof(int), 1, individuos);
+	fread(buffer, sizeof(char), tamanho, individuos);
 	buffer[tamanho] = '\0';
-	fclose(destino);
+	fclose(individuos);
 }
 
 // Devolve o id do cão a partir de um offset
