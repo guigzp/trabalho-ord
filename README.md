@@ -2,6 +2,10 @@
 
 O presente trabalho faz parte da disciplina de Organização e Recuperação de Dados na Universidade Estadual de Maringá no segundo semestre de 2018.
 
+## Autor
+
+* **Guilherme Zamberlam Pomini** - Contato: guizamberlam@hotmail.com
+
 ## Descrição do Trabalho
 
 Este trabalho visa implementar os conceitos de Lista Invertida, Índice Primário e Índice Secundário para manutenção de registros em arquivos. Tais conceitos foram aplicados em um sistema de cadastro e busca de cães, permitindo a importação de arquivos e busca.
